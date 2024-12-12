@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atualizar Quantidade de Produto</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      padding: 0;
+      background-color: #f4f4f9;
+    }
+    h1 {
+      text-align: center;
+    }
+    form {
+      max-width: 400px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    label {
+      font-size: 16px;
+      margin-bottom: 8px;
+      display: block;
+    }
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    input[type="text"]::placeholder, input[type="number"]::placeholder {
+      color: #aaa;
+      font-style: italic;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #resultado {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .error {
+      color: red;
+      font-size: 16px;
+      text-align: center;
+    }
+    .dinamico {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 16px;
+    }
+    .dinamico button {
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Atualizar Quantidade do Produto</h1>
+
+  <!-- Formulário para inserir Código do Produto e Quantidade -->
+  <form id="form-atualizar-quantidade">
+    <label for="codigo">Código do Produto:</label>
+    <input type="text" id="codigo" name="codigo" placeholder="Digite o código do produto" required>
+
+    <label for="quantidade">Nome Quantidade:</label>
+    <input type="number" id="quantidade" name="quantidade" placeholder="Digite a quantidade" required>
+
+    <button type="submit">Atualizar Estoque</button>
+  </form>
+
+  <div id="resultado"></div>
+
+  <div id="dinamico" class="dinamico" style="display: none;">
+    <p>Produto não encontrado. Deseja adicionar um novo produto?</p>
+    <button id="sim">Sim</button>
+    <button id="nao">Não</button>
+  </div>
+
+  <!-- Formulário para adicionar um novo produto -->
+  <div id="adicionar-produto" style="display: none;">
+    <h3>Adicionar Novo Produto</h3>
+    <form id="form-adicionar-produto">
+      <label for="nome">Nome do Produto:</label>
+      <input type="text" id="nome" name="nome" placeholder="Digite o nome do produto" required>
+
+      <label for="validade">Validade (dd-mm-aaaa):</label>
+      <input type="text" id="validade" name="validade" placeholder="Digite a validade" required>
+
+      <button type="submit">Adicionar Produto</button>
+    </form>
+  </div>
+
+  <script>
+    // Função para inicializar os produtos no localStorage se não existirem
+    function inicializarProdutos() {
+      const produtosIniciais = [
+        { PLU: "001", Nome: "Produto A", Quantidade: 10, Validade: "01-01-2025" },
+        { PLU: "002", Nome: "Produto B", Quantidade: 20, Validade: "01-02-2025" },
+        { PLU: "003", Nome: "Produto C", Quantidade: 30, Validade: "01-03-2025" }
+      ];
+
+      // Verifica se já existem produtos no localStorage, se não, inicializa com produtos iniciais
+      if (!localStorage.getItem('produtos')) {
+        localStorage.setItem('produtos', JSON.stringify(produtosIniciais));
+      }
+    }
+
+    // Função para atualizar a quantidade de um produto
+    function atualizarQuantidade(codigo, quantidade) {
+      let produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+      
+      const produto = produtos.find(p => p.PLU === codigo);
+
+      if (produto) {
+        produto.Quantidade += quantidade;  // Atualiza a quantidade
+        if (produto.Quantidade < 0) produto.Quantidade = 0;  // Impede quantidade negativa
+        localStorage.setItem('produtos', JSON.stringify(produtos));  // Atualiza o localStorage
+        return produto;
+      }
+      return null;
+    }
+
+    // Função para adicionar um novo produto no localStorage
+    function adicionarProduto(codigo, nome, validade) {
+      let produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+      const novoProduto = {
+        PLU: codigo,
+        Nome: nome,
+        Quantidade: 0,  // Inicializa a quantidade como 0
+        Validade: validade
+      };
+      produtos.push(novoProduto);
+      localStorage.setItem('produtos', JSON.stringify(produtos));  // Atualiza o localStorage
+      return novoProduto;
+    }
+
+    // Inicializa os produtos no localStorage ao carregar a página
+    inicializarProdutos();
+
+    // Formulário de atualização de quantidade
+    const formAtualizar = document.getElementById('form-atualizar-quantidade');
+    const resultadoDiv = document.getElementById('resultado');
+    const dinamicoDiv = document.getElementById('dinamico');
+    const formAdicionarProduto = document.getElementById('form-adicionar-produto');
+    const adicionarProdutoDiv = document.getElementById('adicionar-produto');
+    const simButton = document.getElementById('sim');
+    const naoButton = document.getElementById('nao');
+
+    formAtualizar.addEventListener('submit', (event) => {
+      event.preventDefault(); // Impede o envio padrão do formulário
+
+      const codigo = document.getElementById('codigo').value;
+      const quantidade = parseInt(document.getElementById('quantidade').value, 10);
+
+      // Atualiza a quantidade no localStorage
+      const produtoAtualizado = atualizarQuantidade(codigo, quantidade);
+
+      // Exibe o resultado
+      if (produtoAtualizado) {
+        resultadoDiv.innerHTML = ` 
+          <p><strong>Produto Atualizado:</strong></p>
+          <p>Nome: ${produtoAtualizado.Nome}</p>
+          <p>Quantidade: ${produtoAtualizado.Quantidade}</p>
+          <p>Validade: ${produtoAtualizado.Validade}</p>
+        `;
+        dinamicoDiv.style.display = "none";  // Esconde a opção de adicionar produto
+      } else {
+        resultadoDiv.innerHTML = `<p class="error">Erro: Produto com Código ${codigo} não encontrado.</p>`;
+        dinamicoDiv.style.display = "block";  // Exibe a opção de adicionar o produto
+        adicionarProdutoDiv.style.display = "none";  // Esconde o formulário de adicionar produto
+      }
+    });
+
+    // Quando o usuário clica em "Sim", exibe o formulário para adicionar um novo produto
+    simButton.addEventListener('click', () => {
+      dinamicoDiv.style.display = "none";  // Esconde a pergunta de adicionar produto
+      adicionarProdutoDiv.style.display = "block";  // Exibe o formulário para adicionar produto
+    });
+
+    // Quando o usuário clica em "Não", apenas esconde a pergunta de adicionar produto
+    naoButton.addEventListener('click', () => {
+      dinamicoDiv.style.display = "none";  // Esconde a pergunta de adicionar produto
+    });
+
+    // Formulário para adicionar um novo produto
+    formAdicionarProduto.addEventListener('submit', (event) => {
+      event.preventDefault(); // Impede o envio padrão do formulário
+
+      const codigo = document.getElementById('codigo').value;
+      const nome = document.getElementById('nome').value;
+      const validade = document.getElementById('validade').value;
+
+      // Adiciona o novo produto no localStorage
+      const novoProduto = adicionarProduto(codigo, nome, validade);
+
+      resultadoDiv.innerHTML = ` 
+        <p><strong>Produto Adicionado:</strong></p>
+        <p>Nome: ${novoProduto.Nome}</p>
+        <p>Validade: ${novoProduto.Validade}</p>
+        <p>Quantidade: ${novoProduto.Quantidade}</p>
+      `;
+
+      // Após adicionar o produto, esconde o formulário de adição
+      adicionarProdutoDiv.style.display = "none";
+    });
+  </script>
+
+</body>
+</html>
