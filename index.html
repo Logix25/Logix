@@ -212,13 +212,13 @@
                 return;
             }
 
-            // Verifica se as credenciais são válidas para a cidade selecionada
+            // Lembrar que aqui verifica as credenciais
             const isValid = currentCityCredentials.some(cred => cred.username === username && cred.password === password);
 
             if (isValid) {
                 let redirectUrl = '';
 
-                // Define a URL de redirecionamento com base na cidade e no cargo
+                // define a url com base na cidade e no cargo
                 if (username.startsWith("gerenteGeral")) {
                     redirectUrl = 'dashboard/BeloJardim.html?role=gerenteGeral';
                 } else if (username.startsWith("gerenteArea")) {
@@ -253,4 +253,3 @@
     </script>
 </body>
 </html>
-ppppp
