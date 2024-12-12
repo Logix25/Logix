@@ -1,0 +1,19 @@
+// app.js
+fetch("http://localhost:3000/api/produtos")
+  .then((response) => response.json()) // Converte a resposta para JSON
+  .then((data) => {
+    console.log("Produtos:", data); // Aqui você terá os produtos
+    // Aqui você pode usar os dados para manipular o DOM e exibir os produtos
+    data.forEach((produto) => {
+      // Exemplo: Exibir produtos no console ou em uma lista HTML
+      console.log(`Produto: ${produto.nome}, Preço: ${produto.preco}`);
+
+      // Adicionando os produtos dinamicamente ao HTML
+      const produtoDiv = document.createElement("div");
+      produtoDiv.textContent = `Produto: ${produto.nome}, Preço: ${produto.preco}, Quantidade: ${produto.quantidade}`;
+      document.body.appendChild(produtoDiv);
+    });
+  })
+  .catch((error) => {
+    console.error("Erro ao buscar produtos:", error);
+  });

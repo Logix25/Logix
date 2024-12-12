@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Belo Jardim</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-image: url('imagens1/tela 2.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            margin: 0;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 30px;
+        }
+
+        #welcomeMessage {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 500;
+            color: #333;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 600px;
+        }
+
+        #roleMessage {
+            font-size: 28px;
+            font-weight: 700;
+            color: #007bff;
+        }
+
+        #headerMenu {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+
+        #headerMenu h3 {
+            font-weight: 500;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+
+        #headerMenu h3:hover {
+            background-color: #0056b3;
+        }
+
+        .section {
+            display: none;
+            width: 80%;
+            max-width: 800px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        #analysisSection label, #navigatorSection label, #validitySection label, #televendasSection label, #pedidosTelevendasSection label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px; /* Reduzido o espaçamento */
+        }
+
+        #analysisSection select, #navigatorSection input, #validitySection input, #televendasSection input, #pedidosTelevendasSection input {
+            background-color: #f4f4f4;
+            border: 1px solid #ccc;
+            padding: 8px; /* Reduzido o padding */
+            border-radius: 6px;
+            width: 100%;
+            margin-bottom: 10px; /* Reduzido o espaçamento */
+        }
+
+        #analysisSection button, #navigatorSection button, #validitySection button, #televendasSection button, #pedidosTelevendasSection button {
+            padding: 12px;
+            width: 100%;
+            font-size: 16px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #analysisSection button:hover, #navigatorSection button:hover, #validitySection button:hover, #televendasSection button:hover, #pedidosTelevendasSection button:hover {
+            background-color: #004494;
+        }
+
+        /* New styles for Televendas layout - All to the left */
+        #televendasSection {
+            text-align: left;
+        }
+
+        #televendasOptions, #televendasForm {
+            width: 100%;
+        }
+
+        #televendasOptions select, #televendasForm input {
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            #headerMenu {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            #headerMenu h3 {
+                margin-bottom: 10px;
+            }
+
+            #televendasSection {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+
+            #televendasOptions, #televendasForm {
+                width: 100%;
+            }
+        }
+
+        footer {
+            position: fixed;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            font-weight: 400;
+        }
+
+        #CentraldePedidosList {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            width: 80%;
+            max-width: 800px;
+            text-align: left;
+        }
+
+        #CentraldePedidosList ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #CentraldePedidosList li {
+            padding: 10px;
+            background-color: #f4f4f4;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .pedido-header {
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .pedido-detail {
+            margin-bottom: 8px;
+        }
+
+        .remove-btn {
+            padding: 6px 12px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .remove-btn:hover {
+            background-color: #cc0000;
+        }
+
+        #successMessage {
+            font-size: 18px;
+            font-weight: 600;
+            color: green;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="welcomeMessage">
+        <h2 id="roleMessage"></h2>
+        <p>Bem-vindo ao sistema de gestão de estoque.</p>
+    </div>
+    <div id="headerMenu">
+    <h3 id="analysisTitle" onclick="toggleSection('analysis')">Análise de Estoque</h3>
+    <h3 id="navigatorTitle" onclick="toggleSection('navigator')">Controle de Estoque</h3>
+    <h3 id="validityTitle" onclick="toggleSection('validity')">Controle de Validade</h3>
+    <h3 id="televendasTitle" onclick="toggleSection('televendas')">Televendas</h3>
+    <h3 id="CentraldePedidosTitle" onclick="toggleSection('CentraldePedidos')">Central de Pedidos</h3>
+<h3 id="productManagementTitle" onclick="redirectToPage()">Gerenciamento de Produtos</h3>
+
+<script>
+    // Função que realiza o redirecionamento para a página desejada
+    function redirectToPage() {
+       window.location.href = "/dashboard/gerenciamento.html";
+
+    }
+</script>
+
+</div>
+
+<!-- Nova Seção para Gerenciamento de Produtos -->
+
+    <div id="analysisSection" class="section">
+        <label for="stockType">Selecione o tipo de estoque:</label>
+        <select id="stockType" onchange="showPerishableOptions()">
+            <option value="">Escolha uma opção</option>
+            <option value="Acougue">Estoque de Acougue</option>
+            <option value="Aves">Estoque de Aves</option>
+             <option value="Hortifruti">Estoque de Hortifruti</option>
+             <option value="Pescados">Estoque de Pescados</option>
+        </select>
+        <button onclick="analyzeStock()">Analisar Estoque</button>
+        <div id="stockMessage"></div>
+    </div>
+
+   <div id="validitySection" class="section">
+        <h3>Controle de Validade</h3>
+        <p> Por enquanto não tem nada</p>
+    </div>
+
+    <div id="navigatorSection" class="section">
+        <h3>Controle de Estoque</h3>
+        <label for="productCode">Código do Produto:</label>
+        <input type="text" id="productCode" placeholder="Digite o código do produto">
+
+        <label for="quantity">Quantidade:</label>
+        <input type="number" id="quantity" placeholder="Digite a quantidade">
+
+        <button onclick="updateStock()">Atualizar Estoque</button>
+        <div id="stockUpdateMessage"></div>
+    </div>
+
+    <div id="televendasSection" class="section">
+        <h3>Televendas</h3>
+        <div id="televendasOptions">
+            <label for="salesType">Selecione o tipo de venda:</label>
+            <select id="salesType">
+                <option value="">Escolha uma opção</option>
+                <option value="acougue">Açougue</option>
+                <option value="deposito">Depósito</option>
+                <option value="hortifruti">Hortifruti</option>
+                <option value="mercearia">Mercearia</option>
+                <option value="pereciveis">Perecíveis</option>
+            </select>
+        </div>
+
+        <div id="televendasForm">
+            <label for="productNameTelevendas">Cliente:</label>
+            <input type="text" id="productNameTelevendas1" placeholder="Digite o nome do Cliente">
+
+            <label for="productNameTelevendas">Nome do Produto:</label>
+            <input type="text" id="productNameTelevendas" placeholder="Digite o nome do produto">
+            
+            <label for="productCodeTelevendas">Código do Produto:</label>
+            <input type="text" id="productCodeTelevendas" placeholder="Digite o código do produto">
+
+            <label for="quantityTelevendas">Quantidade:</label>
+            <input type="number" id="quantityTelevendas" placeholder="Digite a quantidade">
+
+            <label for="withdrawalDate">Data de Retirada:</label>
+            <input type="date" id="withdrawalDate">
+            
+            <button onclick="registerTelevendas()">Registrar Televenda</button>
+            <div id="successMessage"></div>
+        </div>
+    </div>
+
+    <div id="CentraldePedidosSection" class="section">
+        <h3>CentraldePedidos</h3>
+        <div id="CentraldePedidosList">
+            <ul id="pedidosList"></ul>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Sistema de Gestão de Estoque - Belo Jardim</p>
+    </footer>
+
+    <script>
+        let CentraldePedidos = JSON.parse(localStorage.getItem('CentraldePedidos')) || [];
+        
+        function toggleSection(section) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(s => s.classList.remove('active'));
+            document.getElementById(section + 'Section').classList.add('active');
+        }
+
+        function registerTelevendas() {
+    const salesType = document.getElementById('salesType').value;
+    const productName1 = document.getElementById('productNameTelevendas1').value;
+    const productName = document.getElementById('productNameTelevendas').value;
+    const productCode = document.getElementById('productCodeTelevendas').value;
+    const quantity = document.getElementById('quantityTelevendas').value;
+    const withdrawalDate = document.getElementById('withdrawalDate').value;
+
+    if (salesType && productName && productCode && quantity && withdrawalDate) {
+        const pedido = {
+            salesType,
+            productName1,
+            productName,
+            productCode,
+            quantity,
+            withdrawalDate,
+        };
+        CentraldePedidos.push(pedido);
+        localStorage.setItem('CentraldePedidos', JSON.stringify(CentraldePedidos));
+        displayCentraldePedidos();
+        document.getElementById('successMessage').innerText = 'Pedido Registrado com Sucesso!';
+
+        // Limpar os campos após registrar o pedido
+        document.getElementById('salesType').value = '';
+        document.getElementById('productNameTelevendas1').value ='';
+        document.getElementById('productNameTelevendas').value = '';
+        document.getElementById('productCodeTelevendas').value = '';
+        document.getElementById('quantityTelevendas').value = '';
+        document.getElementById('withdrawalDate').value = '';
+    } else {
+        document.getElementById('successMessage').innerText = 'Por favor, preencha todos os campos.';
+    }
+    // Função para adicionar produto
+function addProduct() {
+    const productCode = document.getElementById('productCodeInput').value;
+    const quantity = document.getElementById('productQuantityInput').value;
+
+    if (productCode && quantity) {
+        let products = JSON.parse(localStorage.getItem('products')) || [];
+
+        // Verifica se o produto já existe
+        const existingProduct = products.find(product => product.code === productCode);
+        if (existingProduct) {
+            existingProduct.quantity += parseInt(quantity);
+        } else {
+            products.push({ code: productCode, quantity: parseInt(quantity) });
+        }
+
+        localStorage.setItem('products', JSON.stringify(products));
+
+        // Exibe uma mensagem de sucesso
+        document.getElementById('productUpdateMessage').innerText = `Produto ${productCode} adicionado com ${quantity} unidades.`;
+
+        // Limpar campos
+        document.getElementById('productCodeInput').value = '';
+        document.getElementById('productQuantityInput').value = '';
+    } else {
+        document.getElementById('productUpdateMessage').innerText = 'Por favor, preencha todos os campos.';
+    }
+}
+
+// Função para remover produto
+function removeProduct() {
+    const productCode = document.getElementById('productCodeInput').value;
+    const quantity = document.getElementById('productQuantityInput').value;
+
+    if (productCode && quantity) {
+        let products = JSON.parse(localStorage.getItem('products')) || [];
+
+        // Encontra o produto
+        const existingProduct = products.find(product => product.code === productCode);
+        if (existingProduct) {
+            existingProduct.quantity -= parseInt(quantity);
+            
+            // Se a quantidade chegar a zero ou menos, remove o produto
+            if (existingProduct.quantity <= 0) {
+                products = products.filter(product => product.code !== productCode);
+            }
+
+            localStorage.setItem('products', JSON.stringify(products));
+
+            // Exibe uma mensagem de sucesso
+            document.getElementById('productUpdateMessage').innerText = `Produto ${productCode} removido com ${quantity} unidades.`;
+
+            // Limpar campos
+            document.getElementById('productCodeInput').value = '';
+            document.getElementById('productQuantityInput').value = '';
+        } else {
+            document.getElementById('productUpdateMessage').innerText = 'Produto não encontrado.';
+        }
+    } else {
+        document.getElementById('productUpdateMessage').innerText = 'Por favor, preencha todos os campos.';
+    }
+}
+
+// Função para mostrar a lista de produtos (pode ser chamada quando o usuário quiser ver o estoque)
+function displayProducts() {
+    const products = JSON.parse(localStorage.getItem('products')) || [];
+    let productListHtml = '<ul>';
+    
+    products.forEach(product => {
+        productListHtml += `<li>Produto: ${product.code}, Quantidade: ${product.quantity}</li>`;
+    });
+    
+    productListHtml += '</ul>';
+    document.getElementById('productUpdateMessage').innerHTML = productListHtml;
+}
+
+}
+
+        function formatDate(date) {
+            const d = new Date(date);
+            return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+        }
+
+        function displayCentraldePedidos() {
+            const pedidosList = document.getElementById('pedidosList');
+            pedidosList.innerHTML = '';
+            CentraldePedidos.forEach((pedido, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <div class="pedido-header">Tipo de Venda: ${pedido.salesType}</div>
+                    <div class="pedido-detail">Cliente: ${pedido.productName1}</div>
+                    <div class="pedido-detail">Nome do Produto: ${pedido.productName}</div>
+                    <div class="pedido-detail">Código do Produto: ${pedido.productCode}</div>
+                    <div class="pedido-detail">Quantidade: ${pedido.quantity}</div>
+                    <div class="pedido-detail">Data de Retirada: ${formatDate(pedido.withdrawalDate)}</div>
+                    <button class="remove-btn" onclick="removePedido(${index})">Remover Pedido</button>
+                `;
+                pedidosList.appendChild(li);
+            });
+        }
+
+        function removePedido(index) {
+            CentraldePedidos.splice(index, 1);
+            localStorage.setItem('CentraldePedidos', JSON.stringify(CentraldePedidos));
+            displayCentraldePedidos();
+        }
+function analyzeStock() {
+    const stockType = document.getElementById('stockType').value; // 'geral', 'deposito', 'acougue', etc.
+    
+    if (stockType === 'Acougue') {
+        window.location.href = 'bdbelo.html';  // Redireciona para a página de açougue
+    } else if (stockType === 'Aves') {
+        window.location.href = 'outropagina.html';  // Exemplo para outro tipo de estoque, como depósito
+    } else {
+        // Caso não tenha um tipo válido, pode exibir uma mensagem ou outro comportamento
+        alert('Por favor, selecione um tipo de estoque válido.');
+    }
+}
+
+ // Redireciona para o arquivo bdbelo.html
+ // Adiciona a lista de produtos no elemento de mensagem
+
+        function updateStock() {
+            const productCode = document.getElementById('productCode').value;
+            const quantity = document.getElementById('quantity').value;
+            if (productCode && quantity) {
+                document.getElementById('stockUpdateMessage').innerText = `Estoque de produto ${productCode} atualizado com ${quantity} unidades.`;
+            } else {
+                document.getElementById('stockUpdateMessage').innerText = 'Por favor, preencha todos os campos.';
+            }
+        }
+
+        function updateValidity() {
+            const productCode = document.getElementById('productCodeValidity').value;
+            const expiryDate = document.getElementById('expiryDate').value;
+            if (productCode && expiryDate) {
+                document.getElementById('validityMessage').innerText = `Validade do produto ${productCode} atualizada até ${expiryDate}.`;
+            } else {
+                document.getElementById('validityMessage').innerText = 'Por favor, preencha todos os campos.';
+            }
+
+        }
+        toggleSection('televendas');
+        displayPedidosTelevendas();
+    </script>
+</body>
+</html>

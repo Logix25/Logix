@@ -1,0 +1,13 @@
+const mongoose = require("mongoose");
+
+const produtoSchema = new mongoose.Schema({
+  codigo: { type: String, required: true, unique: true }, // Garantindo que o código seja único
+  nome: { type: String, required: true },
+  preco: { type: Number, required: true },
+  quantidade: { type: Number, required: true },
+  tipoEstoque: { type: String, enum: ["Acougue", "Aves"], required: true }, // Campo para identificar o tipo de estoque
+});
+
+const Produto = mongoose.model("Produto", produtoSchema);
+
+module.exports = Produto;

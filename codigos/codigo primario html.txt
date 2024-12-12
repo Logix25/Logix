@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOGIX</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-image: url('imagens/WhatsApp Image 2024-10-30 at 17.41.54.jpeg'); 
+            background-size: cover; 
+            background-position: center; 
+            background-repeat: no-repeat; 
+            background-attachment: fixed; 
+            height: 100vh; 
+            margin: 0; 
+            color: #333;
+        }
+
+        #loginForm {
+            position: absolute;
+            top: 50%; 
+            right: 10px; 
+            transform: translateY(-50%); 
+            background-color: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); 
+            width: 400px; 
+        }
+
+        #loginForm h2, #loginForm h3 {
+            text-align: center;
+            color: #333; 
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px; 
+            font-weight: 700; 
+        }
+
+        input, select {
+            width: calc(100% - 20px); 
+            padding: 10px; 
+            margin-bottom: 15px; 
+            border: 1px solid #ccc; 
+            border-radius: 5px; 
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); 
+            font-size: 16px; 
+        }
+
+        .show-password {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px; /* Espaçamento entre o checkbox e o próximo campo */
+        }
+
+        .show-password input {
+            width: auto; /* Deixa o checkbox do tamanho normal */
+            margin-right: 10px; /* Espaçamento entre o checkbox e o label */
+        }
+
+        button {
+            width: 100%; 
+            padding: 10px; 
+            background-color: #28a745; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            font-size: 16px; 
+            cursor: pointer; 
+        }
+
+        button:hover {
+            background-color: #218838; 
+        }
+
+        footer {
+            position: absolute;
+            left: 10px;
+            bottom: 10px; 
+            width: 100%;
+            text-align: center; 
+            color: white; 
+        }
+
+        .error {
+            color: red;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div id="loginForm">
+        <h2>Menu</h2>
+        <h3>Gerencie seu Estoque de Forma Eficiente</h3>
+        <p style="text-align: center; margin-bottom: 20px;">Adicione, atualize e retire produtos facilmente.</p>
+        <form id="form" onsubmit="return validateLogin(event)">
+            <label for="username">Insira seu usuário:</label>
+            <input type="text" id="username" required aria-label="Usuário">
+            <div id="usernameError" class="error"></div>
+
+            <label for="password">Insira sua senha:</label>
+            <input type="password" id="password" required aria-label="Senha">
+            <div id="passwordError" class="error"></div>
+
+            <div class="show-password">
+                <input type="checkbox" id="showPassword" onclick="togglePassword()"> 
+                <label for="showPassword">Mostrar senha</label>
+            </div>
+
+            <label for="store">Selecione sua Loja:</label>
+            <select id="store" required onchange="updateCredentials()">
+                <option value="">Selecione a cidade</option>
+                <option value="Belo Jardim">Belo Jardim</option>
+                <option value="Caruaru">Caruaru</option>
+                <option value="Olinda">Olinda</option>
+                <option value="Recife">Recife</option>
+            </select>
+
+            <button type="submit">Entrar</button>
+        </form>
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 Logix | Todos os Direitos Reservados</p>
+    </footer>
+
+    <script>
+        const credentialsByCity = {
+            "Belo Jardim": [
+                { username: "gerenteGeralBelo", password: "senhaGeralBelo" },
+                { username: "gerenteAreaBelo", password: "senhaAreaBelo" },
+                { username: "userBelo", password: "senhaBelo" },
+                { username: "userBelo2", password: "senhaBelo2" }
+            ],
+            "Caruaru": [
+                { username: "userCaruaru", password: "senhaCaruaru" },
+                { username: "userCaruaru2", password: "senhaCaruaru2" }
+            ],
+            "Olinda": [
+                { username: "userOlinda", password: "senhaOlinda" },
+                { username: "userOlinda2", password: "senhaOlinda2" }
+            ],
+            "Recife": [
+                { username: "userRecife", password: "senhaRecife" },
+                { username: "userRecife2", password: "senhaRecife2" }
+            ]
+        };
+
+        const masterCredentials = [
+            { username: "admin", password: "senhaMestre" },
+            { username: "admin2", password: "senhaMestre2" }
+        ];
+
+        let currentCityCredentials = [];
+
+        function togglePassword() {
+            const passwordField = document.getElementById("password");
+            const showPasswordCheckbox = document.getElementById("showPassword");
+            passwordField.type = showPasswordCheckbox.checked ? "text" : "password";
+        }
+
+        function updateCredentials() {
+            const selectedCity = document.getElementById('store').value;
+            currentCityCredentials = credentialsByCity[selectedCity] || [];
+        }
+
+        function validateLogin(event) {
+            event.preventDefault(); // Previne o recarregamento da página
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const city = document.getElementById('store').value;
+            const usernameError = document.getElementById('usernameError');
+            const passwordError = document.getElementById('passwordError');
+
+            // Limpa mensagens de erro anteriores
+            usernameError.textContent = '';
+            passwordError.textContent = '';
+
+            // Verifica se é um login mestre
+            const isMasterLogin = masterCredentials.some(cred => cred.username === username && cred.password === password);
+
+            if (isMasterLogin) {
+                let redirectUrl = '';
+
+                // Redireciona para o dashboard da cidade selecionada (qualquer cidade para o login mestre)
+                switch(city) {
+                    case "Belo Jardim":
+                        redirectUrl = 'dashboard/BeloJardim.html';
+                        break;
+                    case "Caruaru":
+                        redirectUrl = 'dashboard/Caruaru.html';
+                        break;
+                    case "Olinda":
+                        redirectUrl = 'dashboard/Olinda.html';
+                        break;
+                    case "Recife":
+                        redirectUrl = 'dashboard/Recife.html';
+                        break;
+                    default:
+                        alert("Selecione uma cidade para o login mestre.");
+                        return;
+                }
+
+                alert("Login mestre bem-sucedido! Acesso a todas as cidades.");
+                window.location.href = redirectUrl; // Redireciona para a página da cidade selecionada
+                return;
+            }
+
+            // Verifica se as credenciais são válidas para a cidade selecionada
+            const isValid = currentCityCredentials.some(cred => cred.username === username && cred.password === password);
+
+            if (isValid) {
+                let redirectUrl = '';
+
+                // Define a URL de redirecionamento com base na cidade e no cargo
+                if (username.startsWith("gerenteGeral")) {
+                    redirectUrl = 'dashboard/BeloJardim.html?role=gerenteGeral';
+                } else if (username.startsWith("gerenteArea")) {
+                    redirectUrl = 'dashboard/BeloJardim.html?role=gerenteArea';
+                } else {
+                    switch(city) {
+                        case "Belo Jardim":
+                            redirectUrl = 'dashboard/BeloJardim.html';
+                            break;
+                        case "Caruaru":
+                            redirectUrl = 'dashboard/Caruaru.html';
+                            break;
+                        case "Olinda":
+                            redirectUrl = 'dashboard/Olinda.html';
+                            break;
+                        case "Recife":
+                            redirectUrl = 'dashboard/Recife.html';
+                            break;
+                        default:
+                            alert("Cidade não reconhecida.");
+                            return;
+                    }
+                }
+
+                alert(`Login bem-sucedido! Redirecionando para ${city}.`);
+                window.location.href = redirectUrl;
+            } else {
+                usernameError.textContent = "Usuário ou senha incorretos.";
+                passwordError.textContent = "Usuário ou senha incorretos.";
+            }
+        }
+    </script>
+</body>
+</html>

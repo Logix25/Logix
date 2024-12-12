@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerenciamento de Estoque</title>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-image: url('imagens1/tela 2.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      margin: 0;
+      color: black;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+      padding-top: 30px;
+      padding-left: 20px;
+    }
+
+    h1 {
+      text-align: left;
+    }
+
+    .table-container {
+      width: 50%;
+      margin: 0;
+      height: 400px;
+      overflow-y: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      background-color: white;
+      font-size: 12px;
+    }
+
+    th, td {
+      padding: 5px 8px;
+      text-align: left;
+      border: 1px solid #ddd;
+      word-wrap: break-word;
+    }
+
+    th {
+      background-color: #f4f4f4;
+    }
+
+    th:nth-child(1), td:nth-child(1) {
+      width: 2%;
+    }
+
+    th:nth-child(2), td:nth-child(2) {
+      width: 10%;
+    }
+
+    th:nth-child(3), td:nth-child(3) {
+      width: 35%;
+    }
+
+    th:nth-child(n+4), td:nth-child(n+4) {
+      width: 20%;
+    }
+
+    @media (max-width: 768px) {
+      .table-container {
+        width: 90%;
+      }
+
+      table {
+        width: 100%;
+      }
+
+      th, td {
+        padding: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Estoque Atual</h1>
+
+  <div class="table-container">
+    <table id="tabelaProdutos">
+      <thead>
+        <tr>
+          <th>Nº</th>
+          <th>PLU</th>
+          <th>Nome</th>
+          <th>Quantidade</th>
+          <th>Validade</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- As linhas de dados serão preenchidas aqui -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // Função para inicializar os produtos no localStorage com validade fixa
+    function inicializarProdutos() {
+      const produtosIniciais = [
+        { PLU: "001", Nome: "Produto A", Quantidade: 10, Validade: "01-01-2025" },
+        { PLU: "002", Nome: "Produto B", Quantidade: 20, Validade: "01-02-2025" },
+        { PLU: "003", Nome: "Produto C", Quantidade: 30, Validade: "01-03-2025" }
+      ];
+
+      // Verifica se já existem produtos no localStorage, se não, inicializa com produtos iniciais
+      if (!localStorage.getItem('produtos')) {
+        localStorage.setItem('produtos', JSON.stringify(produtosIniciais));
+      }
+    }
+
+    // Função para carregar todos os produtos do localStorage
+    function carregarProdutos() {
+      const tabela = document.getElementById("tabelaProdutos");
+      const tbody = tabela.querySelector("tbody");
+
+      // Limpar qualquer conteúdo anterior
+      tbody.innerHTML = '';
+
+      // Buscar os produtos armazenados no localStorage
+      const produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+      console.log('Produtos carregados do localStorage:', produtos);
+
+      if (produtos.length > 0) {
+        produtos.forEach((produto, index) => {
+          const tr = document.createElement("tr");
+
+          // Preencher as células com os dados do produto
+          const tdNumero = document.createElement("td");
+          tdNumero.textContent = index + 1;
+          tr.appendChild(tdNumero);
+
+          const tdPlu = document.createElement("td");
+          tdPlu.textContent = produto.PLU;
+          tr.appendChild(tdPlu);
+
+          const tdNome = document.createElement("td");
+          tdNome.textContent = produto.Nome;
+          tr.appendChild(tdNome);
+
+          const tdQuantidade = document.createElement("td");
+          tdQuantidade.textContent = produto.Quantidade;
+          tr.appendChild(tdQuantidade);
+
+          const tdValidade = document.createElement("td");
+          tdValidade.textContent = produto.Validade;
+          tr.appendChild(tdValidade);
+
+          // Adicionar a linha à tabela
+          tbody.appendChild(tr);
+        });
+      } else {
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = 5;
+        td.textContent = "Nenhum produto encontrado";
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+      }
+    }
+
+    // Carregar os produtos sempre que a página for carregada
+    window.onload = function() {
+      inicializarProdutos();  // Inicializa os produtos no localStorage se necessário
+      carregarProdutos();     // Carrega os produtos na tabela
+    }
+  </script>
+
+</body>
+</html>

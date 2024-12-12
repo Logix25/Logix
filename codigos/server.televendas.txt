@@ -1,0 +1,88 @@
+const express = require("express");
+const mongoose = require("mongoose");
+const Produto = require("./estoque"); // Importa o modelo Produto
+const Pedido = require("./pedido"); // Modelo Pedido para registrar pedidos
+const cors = require("cors");
+const path = require("path");
+
+const app = express();
+
+// Serve arquivos estáticos da pasta 'public'
+app.use(express.static(path.join(__dirname, "..", "public"))); // Caminho correto para 'public'
+
+// Serve o arquivo index.html na raiz do servidor
+app.get("/", (req, res) => {
+  const indexPath = path.join(__dirname, "..", "public", "index.html"); // Caminho correto
+  console.log("Caminho para o index.html:", indexPath); // Log para depuração
+  res.sendFile(indexPath); // Envia o arquivo index.html
+});
+
+// Configuração do middleware
+app.use(express.json());
+app.use(cors()); // Permite requisições de qualquer origem
+
+// Conecta ao MongoDB
+mongoose
+  .connect("mongodb://localhost:27017/Deposito1") // Conecta ao MongoDB
+  .then(() => {
+    console.log("Conectado ao MongoDB com sucesso!");
+  })
+  .catch((error) => {
+    console.error("Erro ao conectar ao MongoDB:", error);
+  });
+
+// Rota para buscar todos os produtos (estoque geral ou de depósito)
+app.get("/api/produtos", async (req, res) => {
+  const tipoEstoque = req.query.tipoEstoque; // Recebe o tipo de estoque da query
+
+  try {
+    let produtos;
+    if (tipoEstoque === "deposito") {
+      // Filtra os produtos de "deposito"
+      produtos = await Produto.find({ tipoEstoque: "deposito" });
+    } else {
+      // Retorna todos os produtos
+      produtos = await Produto.find();
+    }
+    res.json(produtos); // Retorna os produtos como JSON
+  } catch (error) {
+    console.error("Erro ao buscar produtos:", error);
+    res.status(500).send("Erro ao buscar produtos");
+  }
+});
+
+// Rota para registrar um pedido (foi adicionada para registrar pedidos no MongoDB)
+app.post("/api/pedidos", async (req, res) => {
+  const {
+    salesType,
+    productName1,
+    productName,
+    productCode,
+    quantity,
+    withdrawalDate,
+    status,
+  } = req.body;
+
+  const novoPedido = new Pedido({
+    salesType,
+    productName1,
+    productName,
+    productCode,
+    quantity,
+    withdrawalDate,
+    status: status || "Em andamento", // Status padrão
+  });
+
+  try {
+    const pedidoSalvo = await novoPedido.save();
+    res.status(201).json(pedidoSalvo); // Retorna o pedido salvo
+  } catch (error) {
+    console.error("Erro ao salvar pedido:", error);
+    res.status(500).send("Erro ao salvar pedido");
+  }
+});
+
+// Configuração do servidor Express
+const server = app.listen(3000, () => {
+  console.log("Servidor rodando na porta 3000");
+});

@@ -1,0 +1,133 @@
+const express = require("express");
+const mongoose = require("mongoose");
+const Produto = require("./estoque"); // Importa o modelo Produto
+const cors = require("cors");
+const WebSocket = require("ws"); // Importa a biblioteca WebSocket
+const app = express();
+const path = require("path");
+
+// Serve arquivos estáticos da pasta 'public' (onde estão o index.html e outros recursos)
+app.use(express.static(path.join(__dirname, "..", "public"))); // Caminho correto para 'public'
+
+// Serve o arquivo index.html na raiz do servidor
+app.get("/", (req, res) => {
+  const indexPath = path.join(__dirname, "..", "public", "index.html"); // Caminho correto
+  console.log("Caminho para o index.html:", indexPath); // Log para depuração
+  res.sendFile(indexPath); // Envia o arquivo index.html
+});
+
+// Serve arquivos estáticos da pasta 'dashboard' dentro da pasta 'public'
+app.use(
+  "/dashboard",
+  express.static(path.join(__dirname, "..", "public", "dashboard"))
+); // Corrigido para "public"
+
+// Configuração do middleware
+app.use(express.json());
+app.use(cors()); // Permite requisições de qualquer origem
+
+// Conecta ao MongoDB
+mongoose
+  .connect("mongodb://localhost:27017/Deposito1") // Conecta ao MongoDB
+  .then(() => {
+    console.log("Conectado ao MongoDB com sucesso!");
+  })
+  .catch((error) => {
+    console.error("Erro ao conectar ao MongoDB:", error);
+  });
+
+// Rota para buscar todos os produtos (para estoque geral ou de depósito)
+app.get("/api/produtos", async (req, res) => {
+  const tipoEstoque = req.query.tipoEstoque; // Recebe o tipo de estoque da query (geral, deposito, etc.)
+
+  try {
+    let produtos;
+    if (tipoEstoque === "deposito") {
+      // Filtra os produtos específicos de "deposito" no banco de dados
+      produtos = await Produto.find({ tipoEstoque: "deposito" });
+    } else {
+      // Caso contrário, retorna todos os produtos
+      produtos = await Produto.find();
+    }
+    res.json(produtos); // Retorna os produtos como JSON
+  } catch (error) {
+    console.error("Erro ao buscar produtos:", error);
+    res.status(500).send("Erro ao buscar produtos");
+  }
+});
+
+// Rota para adicionar um produto
+app.post("/api/produtos", async (req, res) => {
+  const { nome, preco, quantidade, tipoEstoque } = req.body; // Incluindo o tipo de estoque
+
+  const novoProduto = new Produto({
+    nome,
+    preco,
+    quantidade,
+    tipoEstoque, // Atribuindo o tipo de estoque (geral, depósito, etc.)
+  });
+  try {
+    const produtoSalvo = await novoProduto.save(); // Salva o produto no MongoDB
+
+    // Envia o produto para todos os clientes conectados via WebSocket
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify(produtoSalvo));
+      }
+    });
+
+    res.status(201).json(produtoSalvo); // Retorna o produto salvo
+  } catch (error) {
+    console.error("Erro ao salvar produto:", error);
+    res.status(500).send("Erro ao salvar produto");
+  }
+});
+
+// Rota para atualizar a quantidade de um produto
+app.patch("/api/produtos/quantidade", async (req, res) => {
+  const { codigo, quantidade } = req.body; // Recebe o código e a quantidade
+
+  try {
+    const produto = await Produto.findOne({ codigo });
+
+    if (!produto) {
+      return res.status(404).json({ message: "Produto não encontrado!" });
+    }
+
+    // Atualiza a quantidade do produto
+    produto.quantidade += quantidade;
+
+    if (produto.quantidade < 0) {
+      return res
+        .status(400)
+        .json({ message: "A quantidade não pode ser negativa!" });
+    }
+
+    const produtoAtualizado = await produto.save();
+    res.status(200).json(produtoAtualizado); // Retorna o produto atualizado
+  } catch (error) {
+    console.error("Erro ao atualizar produto:", error);
+    res.status(500).json({ message: "Erro ao atualizar quantidade!" });
+  }
+});
+
+// Configurando o WebSocket para o servidor
+const server = app.listen(3000, () => {
+  console.log("Servidor rodando na porta 3000");
+});
+
+// Configurando o WebSocket no servidor
+const wss = new WebSocket.Server({ server });
+
+// Quando um cliente se conectar ao WebSocket
+wss.on("connection", (ws) => {
+  console.log("Novo cliente conectado");
+
+  // Enviar uma mensagem inicial para o cliente
+  ws.send(JSON.stringify({ message: "Bem-vindo ao servidor WebSocket!" }));
+
+  // Quando o cliente fechar a conexão
+  ws.on("close", () => {
+    console.log("Cliente desconectado");
+  });
+});

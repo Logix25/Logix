@@ -1,0 +1,2 @@
+iniciar servidor mongodb: cmd-mongod
+db.produtos.deleteMany({}) excluir tudo

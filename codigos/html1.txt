@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOGIX</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos do site e do formulário de login */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-image: url('imagens/WhatsApp Image 2024-10-30 at 17.41.54.jpeg'); 
+            background-size: cover; 
+            background-position: center; 
+            background-repeat: no-repeat; 
+            background-attachment: fixed; 
+            height: 100vh; 
+            margin: 0; 
+            color: #333; /* Cor do texto padrão */
+        }
+
+        /* Estilo do formulário de login */
+        #loginForm {
+            position: absolute;
+            top: 50%; 
+            right: 10px; 
+            transform: translateY(-50%); 
+            background-color: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Sombra do cartão */
+            width: 400px; /* Largura do formulário */
+        }
+
+        /* Estilo do título dentro do formulário */
+        #loginForm h2 {
+            text-align: center;
+            margin-bottom: 20px; /* Espaçamento abaixo do título */
+            font-weight: bold;
+            color: #333; /* Cor do título */
+        }
+
+        /* Estilo do subtítulo dentro do formulário */
+        #loginForm h3 {
+            text-align: center;
+            margin-bottom: 10px; /* Espaçamento abaixo do subtítulo */
+            font-weight: 600;
+            color: #333; /* Cor do subtítulo */
+        }
+
+        /* Estilo dos rótulos e campos do formulário */
+        label {
+            display: block;
+            margin-bottom: 8px; /* Espaçamento entre rótulo e campo */
+            font-weight: 700; /* Rótulo em negrito */
+        }
+
+        input, select {
+            width: calc(100% - 20px); /* Largura total com margens */
+            padding: 10px; /* Espaçamento interno do campo */
+            margin-bottom: 15px; /* Espaçamento entre campos */
+            border: 1px solid #ccc; /* Borda padrão */
+            border-radius: 5px; /* Bordas arredondadas */
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Sombra interna */
+            font-size: 16px; /* Tamanho da fonte */
+        }
+
+        button {
+            width: 100%; /* Botão ocupa a largura total */
+            padding: 10px; 
+            background-color: #28a745; /* Verde para o botão */
+            color: white; /* Cor do texto do botão */
+            border: none; /* Remove borda padrão */
+            border-radius: 5px; /* Bordas arredondadas */
+            font-size: 16px; /* Tamanho da fonte do botão */
+            cursor: pointer; /* Cursor de ponteiro ao passar por cima */
+        }
+
+        button:hover {
+            background-color: #218838; /* Cor de fundo ao passar o mouse */
+        }
+
+        /* Estilo do rodapé */
+        footer {
+            position: absolute;
+            left: 10px;
+            bottom: 10px; /* Ajuste a posição vertical do rodapé */
+            width: 100%;
+            padding: 0px;
+            text-align: center; /* Centraliza o texto do rodapé */
+            color: white; 
+        }
+    </style>
+</head>
+<body>
+    <!-- Formulário de Login -->
+    <div id="loginForm">
+        <h2>Menu</h2>
+        <h3>Gerencie seu Estoque de Forma Eficiente</h3>
+        <p style="text-align: center; margin-bottom: 20px;">Adicione, atualize e retire produtos facilmente.</p>
+        <form onsubmit="return validateLogin()">
+            <label for="username">Insira seu usuário:</label>
+            <input type="text" id="username" required>
+            <label for="password">Insira sua senha:</label>
+            <input type="password" id="password" required>
+            <label for="store">Selecione sua Loja:</label>
+            <select id="store" required>
+                <option value="">Selecione a cidade</option>
+                <option value="Belo Jardim">Belo Jardim</option>
+                <option value="Caruaru">Caruaru</option>
+                <option value="Olinda">Olinda</option>
+                <option value="Recife">Recife</option>
+                <!-- Adicione mais cidades conforme necessário -->
+            </select>
+            <button type="submit">Entrar</button>
+        </form>
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 Logix | Todos os Direitos Reservados</p>
+    </footer>
+
+    <script>
+        function validateLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Lista de credenciais válidas
+            const validCredentials = [
+                { username: "logix25", password: "logix25" },
+                { username: "logix24", password: "logix24" },
+                { username: "logix23", password: "logix23" }
+            ];
+
+            // Verifica se o usuário e a senha são válidos
+            const isValid = validCredentials.some(cred => cred.username === username && cred.password === password);
+
+            if (isValid) {
+                alert("Login bem-sucedido!");
+                window.location.href = 'dashboard/dashboard.html'; // Redireciona para a nova página
+                return false; // Impede o recarregamento da página
+            } else {
+                alert("Usuário ou senha incorretos.");
+                return false; // Impede o recarregamento da página
+            }
+        }
+    </script>
+</body>
+</html>
